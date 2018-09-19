@@ -2,11 +2,11 @@
 title: Shaun Russell Full Stack Software Engineer and Entrepreneur
 email: shaun.d.russell@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  Shaun Russell is a full stack software engineer, specializing in user interfaces and rapid prototyping. His preferred technologies include Ruby, Javascript, Go, and open source databases.
+  Shaun Russell is a full stack software engineer, specializing in user interfaces and rapid prototyping. His preferred technologies include Ruby, React, Javascript, Go, Elixir, and Postgres.
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://shaunrussell.com" # the base hostname & protocol for your site
 twitter: shaunrussell
-github:  shwing
+github:  vandux
 linkedin: shaundrussell
 
 # Build settings

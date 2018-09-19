@@ -3,11 +3,11 @@
 ### workflow
 ```
 gem install jeykll
-jekyll s
+bundle exec jekyll s
 ```
 
 ### deploy
 ```
-jekyll build
+bundle exec jekyll build
 s3cmd sync _site/. s3://shaunrussell.com
 ```
