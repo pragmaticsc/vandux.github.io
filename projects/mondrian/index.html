@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mondrian Painting</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .rect {
+      position: absolute;
+      border: 4px solid black;
+      box-sizing: border-box;
+      opacity: 0;
+      transition: all 0.3s ease, opacity 0.3s ease;
+      cursor: pointer;
+    }
+
+    .rect.visible {
+      opacity: 1;
+    }
+
+    .rect.selected {
+      border-color: #333;
+      filter: brightness(0.8);
+    }
+
+    .red {
+      background-color: #ff0000;
+    }
+
+    .blue {
+      background-color: #0000ff;
+    }
+
+    .yellow {
+      background-color: #ffff00;
+    }
+
+    .white {
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" id="container"></div>
+  <script>
+    let selectedRect = null;
+    let colorCounts = { red: 0, blue: 0, yellow: 0, white: 0 };
+    let rectangles = [];
+    const goldenRatio = 1.618033988749895;
+
+    function generateMondrian() {
+      const container = document.getElementById('container');
+      container.innerHTML = '';
+      colorCounts = { red: 0, blue: 0, yellow: 0, white: 0 };
+      rectangles = [];
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      const colors = ['red', 'blue', 'yellow', 'white'];
+      const minSize = Math.min(width, height) * 0.15;
+      const maxDepth = 4;
+
+      let rectIndex = 0;
+
+      function getAdjacentColors(x, y, w, h) {
+        const adjacentColors = new Set();
+        rectangles.forEach(r => {
+          const rx = r.x, ry = r.y, rw = r.w, rh = r.h, rColor = r.color;
+          // Check left, right, top, bottom adjacency
+          const sharesVerticalEdge =
+            (Math.abs(x + w - rx) < 1 || Math.abs(rx + rw - x) < 1) &&
+            (y <= ry + rh && ry <= y + h);
+          const sharesHorizontalEdge =
+            (Math.abs(y + h - ry) < 1 || Math.abs(ry + rh - y) < 1) &&
+            (x <= rx + rw && rx <= x + w);
+          if (sharesVerticalEdge || sharesHorizontalEdge) {
+            adjacentColors.add(rColor);
+          }
+        });
+        return adjacentColors;
+      }
+
+      function chooseColor(x, y, w, h, isLarge, isSquareLike) {
+        const adjacentColors = getAdjacentColors(x, y, w, h);
+        let availableColors = colors.filter(c => c === 'white' || !adjacentColors.has(c));
+        let color;
+
+        if (isLarge && isSquareLike && Math.random() < 0.8) {
+          color = 'white';
+        } else if (colorCounts.red === 0 && availableColors.includes('red') && Math.random() < 0.2) {
+          color = 'red';
+        } else if (colorCounts.blue === 0 && availableColors.includes('blue') && Math.random() < 0.2) {
+          color = 'blue';
+        } else if (colorCounts.yellow === 0 && availableColors.includes('yellow') && Math.random() < 0.2) {
+          color = 'yellow';
+        } else {
+          // Fallback to available colors, prioritizing white if no primaries are valid
+          color = availableColors.length > 0
+            ? availableColors[Math.floor(Math.random() * availableColors.length)]
+            : 'white';
+        }
+        colorCounts[color]++;
+        return color;
+      }
+
+      function splitRect(x, y, w, h, depth = 0) {
+        if (depth >= maxDepth || w < minSize || h < minSize || (depth > 1 && Math.random() < 0.4)) {
+          const area = w * h;
+          const aspectRatio = w / h;
+          const isLarge = area > window.innerWidth * window.innerHeight * 0.1;
+          const isSquareLike = aspectRatio > 0.8 && aspectRatio < 1.2;
+
+          const color = chooseColor(x, y, w, h, isLarge, isSquareLike);
+
+          const rect = document.createElement('div');
+          rect.className = `rect ${color}`;
+          rect.style.left = `${x}px`;
+          rect.style.top = `${y}px`;
+          rect.style.width = `${w}px`;
+          rect.style.height = `${h}px`;
+          rect.dataset.x = x;
+          rect.dataset.y = y;
+          rect.dataset.width = w;
+          rect.dataset.height = h;
+          container.appendChild(rect);
+
+          rectangles.push({ x, y, w, h, color });
+
+          setTimeout(() => {
+            rect.classList.add('visible');
+          }, rectIndex * 20);
+          rectIndex++;
+
+          rect.addEventListener('click', () => handleRectClick(rect));
+          return;
+        }
+
+        const aspectRatio = w / h;
+        const splitVertically = (aspectRatio > 1 || (aspectRatio > 0.5 && Math.random() > 0.5)) && w > minSize * 1.5;
+
+        if (splitVertically) {
+          const splitFraction = Math.random() < 0.5 ? 1 / goldenRatio : (goldenRatio - 1);
+          const splitX = x + w * splitFraction;
+          splitRect(x, y, splitX - x, h, depth + 1);
+          splitRect(splitX, y, x + w - splitX, h, depth + 1);
+        } else if (h > minSize * 1.5) {
+          const splitFraction = Math.random() < 0.5 ? 1 / goldenRatio : (goldenRatio - 1);
+          const splitY = y + h * splitFraction;
+          splitRect(x, y, w, splitY - y, depth + 1);
+          splitRect(x, splitY, w, y + h - splitY, depth + 1);
+        } else {
+          const area = w * h;
+          const isLarge = area > window.innerWidth * window.innerHeight * 0.1;
+          const isSquareLike = aspectRatio > 0.8 && aspectRatio < 1.2;
+
+          const color = chooseColor(x, y, w, h, isLarge, isSquareLike);
+
+          const rect = document.createElement('div');
+          rect.className = `rect ${color}`;
+          rect.style.left = `${x}px`;
+          rect.style.top = `${y}px`;
+          rect.style.width = `${w}px`;
+          rect.style.height = `${h}px`;
+          rect.dataset.x = x;
+          rect.dataset.y = y;
+          rect.dataset.width = w;
+          rect.dataset.height = h;
+          container.appendChild(rect);
+
+          rectangles.push({ x, y, w, h, color });
+
+          setTimeout(() => {
+            rect.classList.add('visible');
+          }, rectIndex * 20);
+          rectIndex++;
+
+          rect.addEventListener('click', () => handleRectClick(rect));
+        }
+      }
+
+      splitRect(0, 0, width, height);
+    }
+
+    function areAdjacent(rect1, rect2) {
+      const x1 = parseFloat(rect1.dataset.x);
+      const y1 = parseFloat(rect1.dataset.y);
+      const w1 = parseFloat(rect1.dataset.width);
+      const h1 = parseFloat(rect1.dataset.height);
+      const x2 = parseFloat(rect2.dataset.x);
+      const y2 = parseFloat(rect2.dataset.y);
+      const w2 = parseFloat(rect2.dataset.width);
+      const h2 = parseFloat(rect2.dataset.height);
+
+      const sharesVerticalEdge = Math.abs(x1 + w1 - x2) < 1 || Math.abs(x2 + w2 - x1) < 1;
+      const sharesHorizontalEdge = Math.abs(y1 + h1 - y2) < 1 || Math.abs(y2 + h2 - y1) < 1;
+      const verticallyAligned = y1 <= y2 + h2 && y2 <= y1 + h1;
+      const horizontallyAligned = x1 <= x2 + w2 && x2 <= x1 + w1;
+
+      return (sharesVerticalEdge && verticallyAligned) || (sharesHorizontalEdge && horizontallyAligned);
+    }
+
+    function handleRectClick(rect) {
+      if (!selectedRect) {
+        selectedRect = rect;
+        rect.classList.add('selected');
+      } else if (selectedRect === rect) {
+        rect.classList.remove('selected');
+        selectedRect = null;
+      } else {
+        if (areAdjacent(selectedRect, rect)) {
+          mergeRectangles(selectedRect, rect);
+          selectedRect.classList.remove('selected');
+          selectedRect = null;
+        } else {
+          selectedRect.classList.remove('selected');
+          selectedRect = null;
+        }
+      }
+    }
+
+    function mergeRectangles(rect1, rect2) {
+      const x1 = parseFloat(rect1.dataset.x);
+      const y1 = parseFloat(rect1.dataset.y);
+      const w1 = parseFloat(rect1.dataset.width);
+      const h1 = parseFloat(rect1.dataset.height);
+      const x2 = parseFloat(rect2.dataset.x);
+      const y2 = parseFloat(rect2.dataset.y);
+      const w2 = parseFloat(rect2.dataset.width);
+      const h2 = parseFloat(rect2.dataset.height);
+
+      const newX = Math.min(x1, x2);
+      const newY = Math.min(y1, y2);
+      const newWidth = Math.max(x1 + w1, x2 + w2) - newX;
+      const newHeight = Math.max(y1 + h1, y2 + h2) - newY;
+
+      const area = newWidth * newHeight;
+      const aspectRatio = newWidth / newHeight;
+      const isLarge = area > window.innerWidth * window.innerHeight * 0.1;
+      const isSquareLike = aspectRatio > 0.8 && aspectRatio < 1.2;
+
+      // Update rectangles array: remove old, add new after color selection
+      rectangles = rectangles.filter(r =>
+        !(Math.abs(r.x - x1) < 1 && Math.abs(r.y - y1) < 1 && Math.abs(r.w - w1) < 1 && Math.abs(r.h - h1) < 1) &&
+        !(Math.abs(r.x - x2) < 1 && Math.abs(r.y - y2) < 1 && Math.abs(r.w - w2) < 1 && Math.abs(r.h - h2) < 1)
+      );
+
+      const colors = ['red', 'blue', 'yellow', 'white'];
+      const adjacentColors = getAdjacentColors(newX, newY, newWidth, newHeight);
+      let availableColors = colors.filter(c => c === 'white' || !adjacentColors.has(c));
+      let color = (isLarge && isSquareLike && Math.random() < 0.8)
+        ? 'white'
+        : availableColors.length > 0
+          ? availableColors[Math.floor(Math.random() * availableColors.length)]
+          : 'white';
+      colorCounts[color]++;
+
+      const newRect = document.createElement('div');
+      newRect.className = `rect ${color}`;
+      newRect.style.left = `${newX}px`;
+      newRect.style.top = `${newY}px`;
+      newRect.style.width = `${newWidth}px`;
+      newRect.style.height = `${newHeight}px`;
+      newRect.dataset.x = newX;
+      newRect.dataset.y = newY;
+      newRect.dataset.width = newWidth;
+      newRect.dataset.height = newHeight;
+
+      document.getElementById('container').appendChild(newRect);
+      rect1.remove();
+      rect2.remove();
+
+      rectangles.push({ x: newX, y: newY, w: newWidth, h: newHeight, color });
+
+      setTimeout(() => {
+        newRect.classList.add('visible');
+      }, 10);
+
+      newRect.addEventListener('click', () => handleRectClick(newRect));
+    }
+
+    window.addEventListener('resize', generateMondrian);
+    generateMondrian();
+  </script>
+</body>
+
+</html>
