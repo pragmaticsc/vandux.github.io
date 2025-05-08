@@ -32,7 +32,17 @@
 
       <p>Try on your website:</p>
 
-      <pre style="white-space: pre-wrap;">&lt;script src="https://cdn.jsdelivr.net/gh/pragmaticsc/highlighter-public@main/highlighter.20250507_095255.dist.js" onload="window.Highlighter.init({contentSelector: 'body'})" defer&gt;&lt;/script&gt;</pre>
+      <pre style="white-space: pre-wrap; word-break: break-all;">&lt;script src="https://cdn.jsdelivr.net/gh/pragmaticsc/highlighter-public@main/highlighter.20250507_095255.dist.js" onload="window.Highlighter.init({contentSelector: 'body'})" defer&gt;&lt;/script&gt;</pre>
+
+      <p>Or in any website:</p>
+
+      <code>
+        let scriptTag = document.createElement('script');
+        scriptTag.src = 'https://cdn.jsdelivr.net/gh/pragmaticsc/highlighter-public@main/highlighter.20250507_095255.dist.js';
+        document.head.appendChild(scriptTag);
+
+        window.Highlighter.init({contentSelector: 'body'})
+      </code>
 
       <hr>
 
@@ -64,6 +74,6 @@
       </p>
     </div>
   </div>
-  <script src="highlighter.js" defer onload="window.Highlighter.init({contentSelector: 'body'})"></script>
+  <script src="https://cdn.jsdelivr.net/gh/pragmaticsc/highlighter-public@main/highlighter.20250507_095255.dist.js" defer onload="window.Highlighter.init({contentSelector: 'body'})"></script>
 </body>
 </html>
