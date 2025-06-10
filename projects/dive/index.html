@@ -33,17 +33,17 @@
       <p>Try on your website:</p>
 
       <pre style="white-space: pre-wrap; word-break: break-word;">
-&lt;script src="https://cdn.jsdelivr.net/gh/pragmaticsc/highlighter-public@main/highlighter.20250508_204606.dist.js" onload="window.Highlighter.init({contentSelector: 'body'})" defer&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/gh/pragmaticsc/dive-public@main/dive.20250610_064535.dist.js" onload="window.Dive.init({contentSelector: 'body'})" defer&gt;&lt;/script&gt;
       </pre>
 
       <p>Or in any website:</p>
 
       <pre style="white-space: pre-wrap; word-break: break-word;">
 let scriptTag = document.createElement('script');
-scriptTag.src = 'https://cdn.jsdelivr.net/gh/pragmaticsc/highlighter-public@main/highlighter.20250508_204606.dist.js';
+scriptTag.src = 'https://cdn.jsdelivr.net/gh/pragmaticsc/dive-public@main/dive.20250610_064535.dist.js';
 document.head.appendChild(scriptTag);
 
-window.Highlighter.init({contentSelector: 'body'});
+window.Dive.init({contentSelector: 'body'});
       </pre>
 
       <hr>
@@ -76,6 +76,6 @@ window.Highlighter.init({contentSelector: 'body'});
       </p>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/gh/pragmaticsc/highlighter-public@main/highlighter.20250508_204606.dist.js" defer onload="window.Highlighter.init({contentSelector: 'body'})"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/pragmaticsc/dive-public@main/dive.20250610_071248.dist.js" defer onload="window.Dive.init({debug: true, landmarkSelector: 'body', apiEndpoint: 'http://localhost:4000/'})"></script>
 </body>
 </html>
